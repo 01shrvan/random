@@ -59,7 +59,6 @@ class VibeCheckService {
   }
 
   private enhanceVibe(vibe: string, trait: string): string {
-    // Find closest meme trait category
     let closestTrait = "personality"; 
     let bestScore = 0;
     
