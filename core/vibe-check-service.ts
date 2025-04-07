@@ -60,7 +60,7 @@ class VibeCheckService {
 
   private enhanceVibe(vibe: string, trait: string): string {
     // Find closest meme trait category
-    let closestTrait = "personality"; // default
+    let closestTrait = "personality"; 
     let bestScore = 0;
     
     for (const key in this.memeTraits) {
