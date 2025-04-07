@@ -64,7 +64,7 @@ class VibeCheckService {
     let bestScore = 0;
     
     for (const key in this.memeTraits) {
-      // Simple matching algorithm - can be improved
+      
       if (trait.toLowerCase().includes(key)) {
         closestTrait = key;
         bestScore = key.length;
@@ -73,7 +73,7 @@ class VibeCheckService {
     
     const traitData = this.memeTraits[closestTrait as keyof typeof this.memeTraits];
     
-    // Add meme flavor to the vibe
+    
     const adjective = traitData.adjectives[Math.floor(Math.random() * traitData.adjectives.length)];
     const noun = traitData.nouns[Math.floor(Math.random() * traitData.nouns.length)];
     const verb = traitData.verbs[Math.floor(Math.random() * traitData.verbs.length)];
