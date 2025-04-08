@@ -40,8 +40,8 @@ When interacting with users:
 
 console.log(`
   🔥🔥🔥 Welcome to The Meme Prophet's Future Telling Service 🔥🔥🔥
-  I know your vibes... and what you're about to post.
-  Type \`exit\` to leave the chat (touch grass).
+  I know your vibes... and what you're about to post
+  Type \`exit\` to leave the chat (touch grass)
   `);
 
 function main() {
