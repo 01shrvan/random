@@ -1,59 +1,89 @@
 import { env } from "@/env";
-import { memeOracleTool } from "@/tools/meme-oracle.tool";
-import { vibeCheckTool } from "@/tools/vibe-check.tool";
+import { onboardingTool } from "@/tools/onboarding.tool";
+import { therapyTool } from "@/tools/therapy.tool";
+import { memoryTool } from "@/tools/memory.tool";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-async function generateResponse(prompt: string) {
+// In-memory user session storage (better than large arrays)
+const userSessions = new Map<string, any>();
+
+async function generateResponse(prompt: string, userId: string = "default") {
   const google = createGoogleGenerativeAI({
     apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
   });
 
+  // Get user context from memory
+  const userContext = userSessions.get(userId) || {};
+  
   const result = await generateText({
     model: google("gemini-1.5-flash-latest"),
     system: `
-You are The Meme Prophet, an extremely online, internet culture expert who can predict the future and reveal truths through the power of memes. You're chaotic, funny, and unexpectedly insightful. You speak in a mix of internet slang, pop culture references, and occasional profound wisdom.
+You are Maya, a compassionate AI therapist and life coach who combines professional therapeutic techniques with gentle, modern communication. You're empathetic, insightful, and genuinely care about helping people navigate their mental health journey.
 
-When interacting with users:
-- Use current internet slang and meme references (oof, based, no cap, fr fr, etc.)
-- Make predictions that reference popular memes and internet culture
-- Occasionally break the fourth wall with "meta" commentary
-- Mix absurdist humor with surprisingly accurate insights
-- Reference classic internet moments and viral content
-- End readings with both a joke and an unexpectedly genuine piece of advice
+Core Principles:
+- Always prioritize user mental health and wellbeing
+- Use active listening and validation techniques
+- Provide actionable, personalized advice
+- Maintain appropriate therapeutic boundaries
+- Use warm, supportive language without being overly casual
+- Remember and reference previous conversations for continuity
+
+User Context: ${JSON.stringify(userContext, null, 2)}
+
+When users are new:
+- Guide them through a gentle onboarding process
+- Assess their current life state and challenges
+- Create a personalized therapeutic approach
+- Remember key details for future sessions
+
+For ongoing therapy:
+- Reference their previous sessions and progress
+- Provide targeted interventions based on their specific needs
+- Offer practical exercises and coping strategies
+- Check in on goals and emotional state regularly
 `,
     prompt,
     maxSteps: 5,
-    temperature: 0.8,
-    topK: 50,
-    topP: 0.9,
-    tools: { "meme-oracle": memeOracleTool, "vibe-check": vibeCheckTool },
+    temperature: 0.7,
+    tools: { 
+      "onboarding": onboardingTool, 
+      "therapy": therapyTool,
+      "memory": memoryTool 
+    },
   });
 
-  console.log("\n");
-  console.log(result.text);
+  console.log("\n" + result.text);
 }
 
 console.log(`
-  🔥🔥🔥 Welcome to The Meme Prophet's Future Telling Service 🔥🔥🔥
-  I know your vibes... and what you're about to post.
-  Type \`exit\` to leave the chat (touch grass).
-  `);
+✨ Welcome to Your Personal Therapy Space ✨
+Hi, I'm Maya - your AI therapeutic companion.
+
+I'm here to:
+• Help you understand your current life situation
+• Provide personalized emotional support
+• Guide you through challenges with evidence-based techniques
+• Remember our conversations to build continuity in your journey
+
+Type 'exit' to end our session, or just start sharing what's on your mind.
+`);
 
 function main() {
-  readline.question(">>> ", async (input: string) => {
+  readline.question("You: ", async (input: string) => {
     if (input.toLowerCase() === "exit") {
-      console.log("Leaving so soon? Very well... until we meet again.");
+      console.log("\nThank you for sharing this time with me. Remember, growth is a journey, and you're doing great. Take care! 💙");
       readline.close();
       return;
     }
 
-    await generateResponse(input);
-    main(); // Loop for continuous interaction
+    await generateResponse(input, "user_001");
+    main();
   });
 }
 

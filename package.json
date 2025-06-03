@@ -1,10 +1,19 @@
 {
-  "name": "devil-fortune",
+  "name": "therapeutic-ai-companion",
+  "version": "1.0.0",
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "description": "AI-powered therapeutic companion with personalized onboarding and memory",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts",
+    "build": "bun build index.ts --outdir ./dist",
+    "type-check": "tsc --noEmit"
+  },
   "devDependencies": {
-    "@types/bun": "^1.2.8"
+    "@types/bun": "^1.2.8",
+    "@types/node": "^22.0.0"
   },
   "peerDependencies": {
     "typescript": "^5"

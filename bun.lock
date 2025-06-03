@@ -11,6 +11,7 @@
       },
       "devDependencies": {
         "@types/bun": "^1.2.8",
+        "@types/node": "^22.0.0",
       },
       "peerDependencies": {
         "typescript": "^5",
