@@ -1,16 +1,15 @@
 import { env } from "@/env";
-import { onboardingTool } from "@/tools/onboarding.tool";
-import { therapyTool } from "@/tools/therapy.tool";
-import { memoryTool } from "@/tools/memory.tool";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+import { memoryService } from "@/core/memory-service";
+// import { therapyService } from "@/core/therapy-service";
+import { onboardingService } from "@/core/onboarding-service";
 
 const readline = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-// In-memory user session storage (better than large arrays)
 const userSessions = new Map<string, any>();
 
 async function generateResponse(prompt: string, userId: string = "default") {
@@ -18,8 +17,16 @@ async function generateResponse(prompt: string, userId: string = "default") {
     apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
   });
 
-  // Get user context from memory
-  const userContext = userSessions.get(userId) || {};
+  const userContext = memoryService.getUserContext(userId);
+  
+  const needsOnboarding = !userContext.onboardingData;
+  
+  let contextInfo = "";
+  if (needsOnboarding) {
+    contextInfo = "This appears to be a new user who needs onboarding.";
+  } else {
+    contextInfo = `User context: ${JSON.stringify(userContext, null, 2)}`;
+  }
 
   const result = await generateText({
     model: google("gemini-1.5-flash-latest"),
@@ -34,31 +41,91 @@ Core Principles:
 - Use warm, supportive language without being overly casual
 - Remember and reference previous conversations for continuity
 
-User Context: ${JSON.stringify(userContext, null, 2)}
+${contextInfo}
 
-When users are new:
-- Guide them through a gentle onboarding process
-- Assess their current life state and challenges
-- Create a personalized therapeutic approach
-- Remember key details for future sessions
+When users are new, gently gather information about:
+- Their name and what they'd like to be called
+- What brings them here and what's on their mind
+- Their current emotional state and challenges
+- Their stress level and support system
+- What they hope to achieve
 
-For ongoing therapy:
+For ongoing conversations:
 - Reference their previous sessions and progress
 - Provide targeted interventions based on their specific needs
 - Offer practical exercises and coping strategies
 - Check in on goals and emotional state regularly
+
+Always respond with empathy and provide concrete, actionable advice.
 `,
     prompt,
-    maxSteps: 5,
     temperature: 0.7,
-    tools: {
-      onboarding: onboardingTool,
-      therapy: therapyTool,
-      memory: memoryTool,
-    },
+    maxTokens: 1000,
   });
 
+  if (needsOnboarding && prompt.toLowerCase().includes("my name is") || prompt.toLowerCase().includes("i'm") || prompt.toLowerCase().includes("call me")) {
+    const responses = {
+      name: extractName(prompt),
+      emotion: prompt,
+      challenges: prompt,
+      stress: "5", 
+      support: "",
+      priorities: "",
+      goals: "",
+      therapeuticGoals: ""
+    };
+    
+    try {
+      const onboardingData = await onboardingService.processOnboarding(responses, userId);
+      memoryService.storeMemory(userId, 'onboarding', onboardingData, 'high');
+    } catch (error) {
+      console.error("Onboarding error:", error);
+    }
+  }
+
+  try {
+    const sessionData = {
+      input: prompt,
+      timestamp: new Date(),
+      mood: extractMood(prompt)
+    };
+    memoryService.storeMemory(userId, 'session', sessionData, 'medium');
+  } catch (error) {
+    console.error("Session storage error:", error);
+  }
+
   console.log("\n" + result.text);
+}
+
+function extractName(text: string): string {
+  const namePatterns = [
+    /my name is (\w+)/i,
+    /i'm (\w+)/i,
+    /call me (\w+)/i
+  ];
+  
+  for (const pattern of namePatterns) {
+    const match = text.match(pattern);
+    if (match) return match[1];
+  }
+  return "";
+}
+
+function extractMood(text: string): string {
+  const moodKeywords = {
+    anxious: ['anxious', 'worried', 'nervous', 'stressed'],
+    sad: ['sad', 'depressed', 'down', 'low'],
+    angry: ['angry', 'frustrated', 'irritated', 'mad'],
+    hopeful: ['hopeful', 'optimistic', 'positive', 'good'],
+    confused: ['confused', 'uncertain', 'lost', 'unclear']
+  };
+
+  for (const [mood, keywords] of Object.entries(moodKeywords)) {
+    if (keywords.some(keyword => text.toLowerCase().includes(keyword))) {
+      return mood;
+    }
+  }
+  return 'neutral';
 }
 
 console.log(`

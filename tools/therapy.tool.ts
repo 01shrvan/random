@@ -7,8 +7,8 @@ export const therapyTool = tool({
   description: "Provide personalized therapy session",
   parameters: z.object({
     userInput: z.string().describe("what the user shared in this session"),
-    userId: z.string().default("default").describe("user identifier"),
-    sessionType: z.enum(["check-in", "crisis", "goal-review", "general"]).default("general"),
+    userId: z.string().describe("user identifier"),
+    sessionType: z.string().describe("type of therapy session: check-in, crisis, goal-review, or general"),
   }),
   execute: async ({ userInput, userId, sessionType }) => {
     try {
@@ -18,22 +18,20 @@ export const therapyTool = tool({
       
       const therapyOutput = await therapyService.provideTherapy(userInput, lifeState, approach);
       
-      // Store session in memory
       memoryService.storeMemory(userId, 'session', {
         input: userInput,
         output: therapyOutput,
-        type: sessionType
+        type: sessionType || 'general'
       }, 'medium');
       
-      // Store any important insights
-      if (therapyOutput.insights.length > 0) {
+      if (therapyOutput.insights && therapyOutput.insights.length > 0) {
         memoryService.storeMemory(userId, 'insight', therapyOutput.insights, 'high');
       }
       
       return therapyOutput;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to provide therapy session");
+      return { error: "Failed to provide therapy session" };
     }
   },
 });

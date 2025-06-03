@@ -5,8 +5,8 @@ import { memoryService } from "@/core/memory-service";
 export const memoryTool = tool({
   description: "Access user memory and context for personalized responses",
   parameters: z.object({
-    userId: z.string().default("default").describe("user identifier"),
-    action: z.enum(["get_context", "get_recent", "get_progress"]).describe("memory action to perform"),
+    userId: z.string().describe("user identifier"),
+    action: z.string().describe("memory action: get_context, get_recent, or get_progress"),
   }),
   execute: async ({ userId, action }) => {
     try {
@@ -27,7 +27,7 @@ export const memoryTool = tool({
       }
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to access memory");
+      return { error: "Failed to access memory" };
     }
   },
 });
