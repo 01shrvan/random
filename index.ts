@@ -20,7 +20,7 @@ async function generateResponse(prompt: string, userId: string = "default") {
 
   // Get user context from memory
   const userContext = userSessions.get(userId) || {};
-  
+
   const result = await generateText({
     model: google("gemini-1.5-flash-latest"),
     system: `
@@ -51,10 +51,10 @@ For ongoing therapy:
     prompt,
     maxSteps: 5,
     temperature: 0.7,
-    tools: { 
-      "onboarding": onboardingTool, 
-      "therapy": therapyTool,
-      "memory": memoryTool 
+    tools: {
+      onboarding: onboardingTool,
+      therapy: therapyTool,
+      memory: memoryTool,
     },
   });
 
@@ -62,7 +62,6 @@ For ongoing therapy:
 }
 
 console.log(`
-<<<<<<< HEAD
 ✨ Welcome to Your Personal Therapy Space ✨
 Hi, I'm Maya - your AI therapeutic companion.
 
@@ -74,17 +73,13 @@ I'm here to:
 
 Type 'exit' to end our session, or just start sharing what's on your mind.
 `);
-=======
-  🔥🔥🔥 Welcome to The Meme Prophet's Future Telling Service 🔥🔥🔥
-  I know your vibes... and what you're about to post
-  Type \`exit\` to leave the chat (touch grass)
-  `);
->>>>>>> 837be82965c6ec476010fbe0c2516cb6812894ac
 
 function main() {
   readline.question("You: ", async (input: string) => {
     if (input.toLowerCase() === "exit") {
-      console.log("\nThank you for sharing this time with me. Remember, growth is a journey, and you're doing great. Take care! 💙");
+      console.log(
+        "\nThank you for sharing this time with me. Remember, growth is a journey, and you're doing great. Take care! 💙"
+      );
       readline.close();
       return;
     }
