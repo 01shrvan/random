@@ -58,6 +58,7 @@
 //     return templates[Math.floor(Math.random() * templates.length)];
 //   }
 
+<<<<<<< HEAD
 //   private enhanceVibe(vibe: string, trait: string): string {
 //     // Find closest meme trait category
 //     let closestTrait = "personality"; // default
@@ -70,13 +71,33 @@
 //         bestScore = key.length;
 //       }
 //     }
+=======
+  private enhanceVibe(vibe: string, trait: string): string {
+    let closestTrait = "personality"; 
+    let bestScore = 0;
+    
+    for (const key in this.memeTraits) {
+      
+      if (trait.toLowerCase().includes(key)) {
+        closestTrait = key;
+        bestScore = key.length;
+      }
+    }
+>>>>>>> 837be82965c6ec476010fbe0c2516cb6812894ac
     
 //     const traitData = this.memeTraits[closestTrait as keyof typeof this.memeTraits];
     
+<<<<<<< HEAD
 //     // Add meme flavor to the vibe
 //     const adjective = traitData.adjectives[Math.floor(Math.random() * traitData.adjectives.length)];
 //     const noun = traitData.nouns[Math.floor(Math.random() * traitData.nouns.length)];
 //     const verb = traitData.verbs[Math.floor(Math.random() * traitData.verbs.length)];
+=======
+    
+    const adjective = traitData.adjectives[Math.floor(Math.random() * traitData.adjectives.length)];
+    const noun = traitData.nouns[Math.floor(Math.random() * traitData.nouns.length)];
+    const verb = traitData.verbs[Math.floor(Math.random() * traitData.verbs.length)];
+>>>>>>> 837be82965c6ec476010fbe0c2516cb6812894ac
     
 //     // Add a more meme-y second sentence
 //     const enhancers = [
@@ -133,4 +154,8 @@
 //   }
 // }
 
+<<<<<<< HEAD
 // export const vibeCheckService = new VibeCheckService();
+=======
+export const vibeCheckService = new VibeCheckService();
+>>>>>>> 837be82965c6ec476010fbe0c2516cb6812894ac

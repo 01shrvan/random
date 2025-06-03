@@ -62,6 +62,7 @@ For ongoing therapy:
 }
 
 console.log(`
+<<<<<<< HEAD
 ✨ Welcome to Your Personal Therapy Space ✨
 Hi, I'm Maya - your AI therapeutic companion.
 
@@ -73,6 +74,12 @@ I'm here to:
 
 Type 'exit' to end our session, or just start sharing what's on your mind.
 `);
+=======
+  🔥🔥🔥 Welcome to The Meme Prophet's Future Telling Service 🔥🔥🔥
+  I know your vibes... and what you're about to post
+  Type \`exit\` to leave the chat (touch grass)
+  `);
+>>>>>>> 837be82965c6ec476010fbe0c2516cb6812894ac
 
 function main() {
   readline.question("You: ", async (input: string) => {
